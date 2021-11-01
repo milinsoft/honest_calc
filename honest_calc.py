@@ -1,14 +1,16 @@
+import operator
+
 msg_0 = "Enter an equation"
 msg_1 = "Do you even know what numbers are? Stay focused!"
 msg_2 = "Yes ... an interesting math operation. You've slept through all classes, haven't you?"
-
+msg_3 = "Yeah... division by zero. Smart move..."
 
 def is_invalid_type(char):
     return char.isalpha()
 
 
-def is_valid_operator(operator):
-    return operator in {"+", "-", "*", "/"}
+def calculate_result(arg1, sign, arg2):
+    ...
 
 
 def main():
@@ -22,8 +24,15 @@ def main():
         print(msg_1)
         return main()
     else:
-        if is_valid_operator(oper):
-            exit()
+        x, y = float(x), float(y)
+        ops = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
+        if oper in ops:
+            try:
+                result = ops[oper](x, y)
+                print(result)
+            except ZeroDivisionError:
+                print(msg_3)
+                return main()
         else:
             print(msg_2)
             return main()
