@@ -1,85 +1,87 @@
 import operator  # https://docs.python.org/3/library/operator.html
 
 
-# messages
-msg_0 = "Enter an equation"
-msg_1 = "Do you even know what numbers are? Stay focused!"
-msg_2 = "Yes ... an interesting math operation. You've slept through all classes, haven't you?"
-msg_3 = "Yeah... division by zero. Smart move..."
-msg_4 = "Do you want to store the result? (y / n):"
-msg_5 = "Do you want to continue calculations? (y / n):"
+class HonestCalculator:
+    # messages
+    messages = {"msg_0": "Enter an equation",
+                "msg_1": "Do you even know what numbers are? Stay focused!",
+                "msg_2": "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
+                "msg_3": "Yeah... division by zero. Smart move...",
+                "msg_4": "Do you want to store the result? (y / n):",
+                "msg_5": "Do you want to continue calculations? (y / n):"
+                }
 
+    ops = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
 
-def is_invalid_type(char):
-    return str(char).isalpha()
+    memory = 0.00
 
+    def __init__(self, x, oper, y):
+        self.x = x
+        self.oper = oper
+        self.y = y
+        self.result = 0.00
 
-def result_saver(_result, _memory):
-    print(msg_4)
-    answer_store = input().lower()
+    @staticmethod
+    def is_invalid_type(char):
+        return str(char).isalpha()
 
-    if answer_store == "y":
-        _memory = _result
-        return _memory
+    @classmethod
+    def from_string(cls, data):
+        x, oper, y = data.split()
+        return cls(x, oper, y)
 
-    elif answer_store == "n":
-        return _memory
-    else:
-        return result_saver(_result, _memory)
+    def result_saver(self):
+        print(self.messages['msg_4'])
+        answer_store = input().lower()
+        if answer_store == "y":
+            HonestCalculator.memory = self.result
+            return HonestCalculator.memory
+        elif answer_store == "n":
+            return HonestCalculator.memory
+        else:
+            return self.result_saver()
 
+    def continue_calc(self):
+        print(self.messages['msg_5'])
+        continue_calculations = input()
 
-def continue_calc():
-    print(msg_5)
-    continue_calculations = input()
-
-    if continue_calculations == "y":
-        return main()
-    elif continue_calculations == "n":
-        exit()
-    else:
-        return continue_calc()
-
-
-memory = 0.00  # type(float)
+        if continue_calculations == "y":
+            return main()
+        elif continue_calculations == "n":
+            exit()
+        else:
+            return self.continue_calc()
 
 
 def main():
-    global memory
-
-    print(msg_0)
+    print(HonestCalculator.messages['msg_0'])
     # read calc
-    calc = input()
-    # split
-    x, oper, y = calc.split()
+    calc = HonestCalculator.from_string(input())
 
-    if x == "M":
-        x = memory
-    if y == "M":
-        y = memory
+    if calc.x == "M":
+        calc.x = HonestCalculator.memory
+    if calc.y == "M":
+        calc.y = HonestCalculator.memory
 
-    if any([is_invalid_type(x), is_invalid_type(y)]):
-        print(msg_1)
+    if any([HonestCalculator.is_invalid_type(calc.x), HonestCalculator.is_invalid_type(calc.y)]):
+        print(calc.messages['msg_1'])
         return main()
     else:
-        x, y = float(x), float(y)
-        ops = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
-        if oper in ops:
+        calc.x, calc.y = float(calc.x), float(calc.y)
+        if calc.oper in calc.ops:
             try:
-                result = ops[oper](x, y)
+                calc.result = calc.ops[calc.oper](calc.x, calc.y)
             except ZeroDivisionError:
-                print(msg_3)
+                print(calc.messages['msg_3'])
                 return main()
-            print(result)
+            print(calc.result)
 
-            memory = result_saver(result, memory)
-            continue_calc()
-
+            calc.result_saver()
+            calc.continue_calc()
         else:
-            print(msg_2)
+            print(calc.messages['msg_2'])
             return main()
 
 
 if __name__ == '__main__':
     main()
-
-
