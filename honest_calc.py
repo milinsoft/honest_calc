@@ -13,6 +13,9 @@ class HonestCalculator:
                 "msg_7": " ... very lazy",
                 "msg_8": " ... very, very lazy",
                 "msg_9": "You are",
+                "msg_10": "Are you sure? It is only one digit! (y / n)",
+                "msg_11": "Don't be silly! It's just one number! Add to the memory? (y / n)",
+                "msg_12": "Last chance! Do you really want to embarrass yourself? (y / n)",
                 }
 
     ops = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
@@ -37,9 +40,36 @@ class HonestCalculator:
     def result_saver(self):
         print(self.messages['msg_4'])
         answer_store = input().lower()
+
+
         if answer_store == "y":
-            HonestCalculator.memory = self.result
+            if not is_one_digit(self.result):
+                # print(" ONE DIGIT CHECK SHOWS THAT is_one_digit(self.result):", is_one_digit(self.result))
+                HonestCalculator.memory = self.result
+
+            else:
+                def obtain_answer(self, msg_index):
+                    print(HonestCalculator.messages[f'msg_{msg_index}'])
+                    answer = input()
+                    if answer == "y":
+                        # print("CURRENT MSG_INDEX:", msg_index)
+                        if msg_index < 12:
+                            msg_index += 1
+                            return obtain_answer(self, msg_index)
+                        else:
+                            HonestCalculator.memory = self.result
+                    elif answer == "n":
+                        # print("the answer was NO:, current memory status:\n", HonestCalculator.memory)
+                        # return HonestCalculator.memory
+                        pass
+                    else:
+                        return obtain_answer(msg_index)
+                msg_index = 10
+                obtain_answer(self, msg_index)
+
+            # HonestCalculator.memory = self.result
             return HonestCalculator.memory
+
         elif answer_store == "n":
             return HonestCalculator.memory
         else:
@@ -58,14 +88,13 @@ class HonestCalculator:
 
 
 def is_one_digit(digit):
-    return (-10 < digit < 10) and isinstance(digit, (int, float))
+    return all([(-10 < digit < 10),  isinstance(digit, float), digit % 1 == 0])  # last statement needed purely for lazy messages
 
 
 def check(v1, v2, v3):
     msg = ""
     if all([is_one_digit(v1), is_one_digit(v2)]):
         msg = msg + HonestCalculator.messages['msg_6']
-        # print("MESSAGE IS:",msg)
     if any([v1 == 1 and v3 == "*", v2 == 1 and v3 == "*"]):
         msg = msg + HonestCalculator.messages['msg_7']
     if any([(v1 == 0 or v2 == 0) and (v3 == "*" or v3 == "+" or v3 == "-")]):
@@ -81,6 +110,7 @@ def main():
     calc = HonestCalculator.from_string(input())
 
     if calc.x == "M":
+        # print("LINE 113 calc.x currently:", HonestCalculator.memory)
         calc.x = HonestCalculator.memory
     if calc.y == "M":
         calc.y = HonestCalculator.memory
@@ -99,9 +129,12 @@ def main():
             except ZeroDivisionError:
                 print(calc.messages['msg_3'])
                 return main()
+
+
             print(calc.result)
 
             calc.result_saver()
+
             calc.continue_calc()
         else:
             print(calc.messages['msg_2'])
