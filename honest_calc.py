@@ -8,7 +8,11 @@ class HonestCalculator:
                 "msg_2": "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
                 "msg_3": "Yeah... division by zero. Smart move...",
                 "msg_4": "Do you want to store the result? (y / n):",
-                "msg_5": "Do you want to continue calculations? (y / n):"
+                "msg_5": "Do you want to continue calculations? (y / n):",
+                "msg_6": " ... lazy",
+                "msg_7": " ... very lazy",
+                "msg_8": " ... very, very lazy",
+                "msg_9": "You are",
                 }
 
     ops = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
@@ -53,6 +57,24 @@ class HonestCalculator:
             return self.continue_calc()
 
 
+def is_one_digit(digit):
+    return (-10 < digit < 10) and isinstance(digit, (int, float))
+
+
+def check(v1, v2, v3):
+    msg = ""
+    if all([is_one_digit(v1), is_one_digit(v2)]):
+        msg = msg + HonestCalculator.messages['msg_6']
+        # print("MESSAGE IS:",msg)
+    if any([v1 == 1 and v3 == "*", v2 == 1 and v3 == "*"]):
+        msg = msg + HonestCalculator.messages['msg_7']
+    if any([(v1 == 0 or v2 == 0) and (v3 == "*" or v3 == "+" or v3 == "-")]):
+        msg = msg + HonestCalculator.messages['msg_8']
+    if msg != "":
+        msg = HonestCalculator.messages['msg_9'] + msg
+        print(msg)
+
+
 def main():
     print(HonestCalculator.messages['msg_0'])
     # read calc
@@ -69,6 +91,9 @@ def main():
     else:
         calc.x, calc.y = float(calc.x), float(calc.y)
         if calc.oper in calc.ops:
+
+            check(calc.x, calc.y, calc.oper)
+
             try:
                 calc.result = calc.ops[calc.oper](calc.x, calc.y)
             except ZeroDivisionError:
