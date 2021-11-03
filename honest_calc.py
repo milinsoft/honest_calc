@@ -3,20 +3,20 @@ import operator  # https://docs.python.org/3/library/operator.html
 
 class HonestCalculator:
     # messages
-    messages = {"msg_0": "Enter an equation",
-                "msg_1": "Do you even know what numbers are? Stay focused!",
-                "msg_2": "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
-                "msg_3": "Yeah... division by zero. Smart move...",
-                "msg_4": "Do you want to store the result? (y / n):",
-                "msg_5": "Do you want to continue calculations? (y / n):",
-                "msg_6": " ... lazy",
-                "msg_7": " ... very lazy",
-                "msg_8": " ... very, very lazy",
-                "msg_9": "You are",
-                "msg_10": "Are you sure? It is only one digit! (y / n)",
-                "msg_11": "Don't be silly! It's just one number! Add to the memory? (y / n)",
-                "msg_12": "Last chance! Do you really want to embarrass yourself? (y / n)",
-                }
+    messages = ("Enter an equation",
+                "Do you even know what numbers are? Stay focused!",
+                "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
+                "Yeah... division by zero. Smart move...",
+                "Do you want to store the result? (y / n):",
+                "Do you want to continue calculations? (y / n):",
+                " ... lazy",
+                " ... very lazy",
+                " ... very, very lazy",
+                "You are",
+                "Are you sure? It is only one digit! (y / n)",
+                "Don't be silly! It's just one number! Add to the memory? (y / n)",
+                "Last chance! Do you really want to embarrass yourself? (y / n)",
+                )  # converted from dict to tuple to reduce memory consumption from 232 to 40 bytes
 
     ops = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
 
@@ -34,41 +34,35 @@ class HonestCalculator:
 
     @classmethod
     def from_string(cls, data):
-        x, oper, y = data.split()
+        try:
+            x, oper, y = data.split()
+        except ValueError:
+            print("An equation must be delimited with a space, like: 1 + 2")
+            return main()
         return cls(x, oper, y)
 
     def result_saver(self):
-        print(self.messages['msg_4'])
+        print(self.messages[4])
         answer_store = input().lower()
-
-
         if answer_store == "y":
             if not is_one_digit(self.result):
-                # print(" ONE DIGIT CHECK SHOWS THAT is_one_digit(self.result):", is_one_digit(self.result))
                 HonestCalculator.memory = self.result
-
             else:
-                def obtain_answer(self, msg_index):
-                    print(HonestCalculator.messages[f'msg_{msg_index}'])
+                def obtain_answer(msg_index):
+                    print(HonestCalculator.messages[msg_index])
                     answer = input()
                     if answer == "y":
-                        # print("CURRENT MSG_INDEX:", msg_index)
                         if msg_index < 12:
                             msg_index += 1
-                            return obtain_answer(self, msg_index)
+                            return obtain_answer(msg_index)
                         else:
                             HonestCalculator.memory = self.result
                     elif answer == "n":
-                        # print("the answer was NO:, current memory status:\n", HonestCalculator.memory)
-                        # return HonestCalculator.memory
                         pass
                     else:
                         return obtain_answer(msg_index)
-                msg_index = 10
-                obtain_answer(self, msg_index)
 
-            # HonestCalculator.memory = self.result
-            return HonestCalculator.memory
+                obtain_answer(msg_index=10)
 
         elif answer_store == "n":
             return HonestCalculator.memory
@@ -76,7 +70,7 @@ class HonestCalculator:
             return self.result_saver()
 
     def continue_calc(self):
-        print(self.messages['msg_5'])
+        print(self.messages[5])
         continue_calculations = input()
 
         if continue_calculations == "y":
@@ -87,36 +81,35 @@ class HonestCalculator:
             return self.continue_calc()
 
 
-def is_one_digit(digit):
+def is_one_digit(digit) -> bool:
     return all([(-10 < digit < 10),  isinstance(digit, float), digit % 1 == 0])  # last statement needed purely for lazy messages
 
 
 def check(v1, v2, v3):
     msg = ""
     if all([is_one_digit(v1), is_one_digit(v2)]):
-        msg = msg + HonestCalculator.messages['msg_6']
-    if any([v1 == 1 and v3 == "*", v2 == 1 and v3 == "*"]):
-        msg = msg + HonestCalculator.messages['msg_7']
+        msg = msg + HonestCalculator.messages[6]
+    if all([v3 == "*", any([v2 == 1, v1 == 1])]):
+        msg = msg + HonestCalculator.messages[7]
     if any([(v1 == 0 or v2 == 0) and (v3 == "*" or v3 == "+" or v3 == "-")]):
-        msg = msg + HonestCalculator.messages['msg_8']
+        msg = msg + HonestCalculator.messages[8]
     if msg != "":
-        msg = HonestCalculator.messages['msg_9'] + msg
+        msg = HonestCalculator.messages[9] + msg
         print(msg)
 
 
 def main():
-    print(HonestCalculator.messages['msg_0'])
+    print(HonestCalculator.messages[0])
     # read calc
     calc = HonestCalculator.from_string(input())
 
     if calc.x == "M":
-        # print("LINE 113 calc.x currently:", HonestCalculator.memory)
         calc.x = HonestCalculator.memory
     if calc.y == "M":
         calc.y = HonestCalculator.memory
 
     if any([HonestCalculator.is_invalid_type(calc.x), HonestCalculator.is_invalid_type(calc.y)]):
-        print(calc.messages['msg_1'])
+        print(calc.messages[1])
         return main()
     else:
         calc.x, calc.y = float(calc.x), float(calc.y)
@@ -127,9 +120,8 @@ def main():
             try:
                 calc.result = calc.ops[calc.oper](calc.x, calc.y)
             except ZeroDivisionError:
-                print(calc.messages['msg_3'])
+                print(calc.messages[3])
                 return main()
-
 
             print(calc.result)
 
@@ -137,7 +129,7 @@ def main():
 
             calc.continue_calc()
         else:
-            print(calc.messages['msg_2'])
+            print(calc.messages[2])
             return main()
 
 
